@@ -1,27 +1,27 @@
 # from .models import Account_Record, Transaction_Record
-from account.models import transaction_record, account_record, audit_record
+from account.models import TransactionRecord, AccountRecord, AuditRecord
 
 class Account:
     def __init__(self, account_id):
         self.account_id = account_id
         self._balance = None
+        self._account_record = AccountRecord.objects.get(pk=self.account_id)
 
 
     def calcuate_initial_balance(self):
-        account = account_record.objects.get(pk=self.account_id)
         money_in = sum([
             transaction.amount 
             for 
             transaction 
             in 
-            account.money_in_transactions.all()
+            self._account_record.money_in_transactions.all()
         ])
         money_out = sum([
             transaction.amount 
             for 
             transaction 
             in 
-            account.money_out_transactions.all()
+            self._account_record.money_out_transactions.all()
         ])
 
         return money_in - money_out
@@ -36,8 +36,8 @@ class Account:
 
     @balance.setter
     def balance(self, new_balance):
-        new_audit_record = audit_record(
-            account_record = account_record.objects.get(pk=self.account_id),
+        new_audit_record = AuditRecord(
+            account_record = self._account_record,
             old_balance = self.balance,
             new_balance = new_balance
         )
@@ -47,9 +47,9 @@ class Account:
 
     def deposit(self, amount):
         self.balance += amount
-        new_transaction_record = transaction_record(
+        new_transaction_record = TransactionRecord(
             transaction_type = 'deposit',
-            target = account_record.objects.get(pk=self.account_id),
+            target = self._account_record,
             amount = amount
         )
         new_transaction_record.save()
@@ -57,9 +57,9 @@ class Account:
 
     def withdraw(self, amount):
         self.balance -= amount
-        new_transaction_record = transaction_record(
+        new_transaction_record = TransactionRecord(
             transaction_type = 'withdraw',
-            source = account_record.objects.get(pk=self.account_id),
+            source = self._account_record,
             amount = amount
         )
         new_transaction_record.save()
@@ -68,10 +68,10 @@ class Account:
     def transfer_in(self, amount, source_account_id):
         self.balance += amount
         accounts[source_account_id].balance -= amount
-        new_transaction_record = transaction_record(
+        new_transaction_record = TransactionRecord(
             transaction_type = 'transfer',
-            source = account_record.objects.get(pk=source_account_id),
-            target = account_record.objects.get(pk=self.account_id),
+            source = AccountRecord.objects.get(pk=source_account_id),
+            target = self._account_record,
             amount = amount
         )
         new_transaction_record.save()
@@ -81,7 +81,6 @@ class Accounts:
     def __init__(self):
         self._accounts = {}
         pass
-
 
     def __getitem__(self, account_id):
         if account_id in self._accounts.keys():

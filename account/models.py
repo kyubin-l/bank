@@ -4,15 +4,14 @@ from django.utils import timezone
 
 # Create your models here.
 
-class account_record(models.Model):
+class AccountRecord(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self) -> str:
         return self.name
 
 
-class transaction_record(models.Model):
-
+class TransactionRecord(models.Model):
     transition_record_options = (
         ('deposit', 'DEPOSIT'),
         ('withdrawal', 'WITHDRAWAL'),
@@ -21,14 +20,14 @@ class transaction_record(models.Model):
 
     transaction_type = models.CharField(max_length=10, choices=transition_record_options)
     source = models.ForeignKey(
-        account_record,
+        AccountRecord,
         on_delete=models.PROTECT, 
         related_name='money_out_transactions', 
         null=True, 
         blank=True
     )
     target = models.ForeignKey(
-        account_record, 
+        AccountRecord, 
         on_delete=models.PROTECT, 
         related_name='money_in_transactions', 
         null=True, 
@@ -41,9 +40,9 @@ class transaction_record(models.Model):
         return f'{self.transaction_type}, {self.source}, {self.target}, {self.amount}'
 
 
-class audit_record(models.Model):
+class AuditRecord(models.Model):
     account_record = models.ForeignKey(
-        account_record,
+        AccountRecord,
         on_delete=models.PROTECT,
     )
     old_balance = models.IntegerField(default=0)

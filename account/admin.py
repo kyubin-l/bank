@@ -1,9 +1,9 @@
 from re import T
 from django.contrib import admin
-from .models import account_record, transaction_record, audit_record
+from .models import AccountRecord, TransactionRecord, AuditRecord
 
-admin.site.register(account_record)
-admin.site.register(transaction_record)
-admin.site.register(audit_record)
+admin.site.register(AccountRecord)
+admin.site.register(TransactionRecord)
+admin.site.register(AuditRecord)
 
 # Register your models here.

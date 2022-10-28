@@ -8,7 +8,7 @@ from .business_logic.accounts import accounts
 
 
 
-from .models import account_record, transaction_record
+from .models import AccountRecord, TransactionRecord
 # Create your views here.
 
 class IndexView(generic.ListView):
@@ -16,12 +16,12 @@ class IndexView(generic.ListView):
     context_object_name = 'all_accounts'
 
     def get_queryset(self):
-        return account_record.objects.all()
+        return AccountRecord.objects.all()
 
 
 def withdraw(request):
     if request.method == 'GET':
-        all_accounts = account_record.objects.all()
+        all_accounts = AccountRecord.objects.all()
         return render(request, 'account/withdraw.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
@@ -31,16 +31,16 @@ def withdraw(request):
         accounts[account_id].withdraw(amount)
 
         messages.success(request, f'You succesfully withdrew {amount} from account \
-            {account_record.objects.get(pk=account_id)}')
+            {AccountRecord.objects.get(pk=account_id)}')
         messages.success(request, f'Account balance for \
-            {account_record.objects.get(pk=account_id)}: {accounts[account_id].balance}')
+            {AccountRecord.objects.get(pk=account_id)}: {accounts[account_id].balance}')
 
     return HttpResponseRedirect(reverse('withdraw'))
 
 
 def deposit(request):
     if request.method == 'GET':
-        all_accounts = account_record.objects.all()
+        all_accounts = AccountRecord.objects.all()
         return render(request, 'account/deposit.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
@@ -50,16 +50,16 @@ def deposit(request):
         accounts[account_id].deposit(amount)
 
         messages.success(request, f'You succesfully deposited {amount} to account \
-            {account_record.objects.get(pk=account_id)}')
+            {AccountRecord.objects.get(pk=account_id)}')
         messages.success(request, f'Account balance for \
-            {account_record.objects.get(pk=account_id)}: {accounts[account_id].balance}')
+            {AccountRecord.objects.get(pk=account_id)}: {accounts[account_id].balance}')
 
     return HttpResponseRedirect(reverse('deposit'))
 
 
 def transfer(request):
     if request.method == 'GET':
-        all_accounts = account_record.objects.all()
+        all_accounts = AccountRecord.objects.all()
         return render(request, 'account/transfer.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
@@ -70,12 +70,12 @@ def transfer(request):
         accounts[target_account_id].transfer_in(amount, source_account_id)
 
         messages.success(request, f'You succesfully transfered {amount} from account \
-            {account_record.objects.get(pk=source_account_id)} \
-            to account {account_record.objects.get(pk=target_account_id)}')
+            {AccountRecord.objects.get(pk=source_account_id)} \
+            to account {AccountRecord.objects.get(pk=target_account_id)}')
         messages.success(request, f'Account balance for \
-            {account_record.objects.get(pk=source_account_id)}: {accounts[source_account_id].balance}') 
+            {AccountRecord.objects.get(pk=source_account_id)}: {accounts[source_account_id].balance}') 
         messages.success(request, f'Account balance for \
-            {account_record.objects.get(pk=target_account_id)}: {accounts[target_account_id].balance}') 
+            {AccountRecord.objects.get(pk=target_account_id)}: {accounts[target_account_id].balance}') 
 
     return HttpResponseRedirect(reverse('transfer'))
     
