@@ -1,0 +1,27 @@
+<h1> Savings Account List: </h1>
+{% if saving_accounts %}
+    <ul>
+    {% for account in saving_accounts %}
+    <form action= "{% url 'monthly_interest' %}" method="post">
+        {% csrf_token %}
+        <li>{{ account.account_record.name }}, balance: {{account.balance}}</a></li>
+
+        <label> Enter interest rate: </label><br>
+        <input type="number" step="0.01" name="interest" value=0.5><br><br>
+        <input type="hidden" value={{account.account_id}} name="account_id">
+        <input type="submit" value="Apply Monthly Interest">
+    </form>
+
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No savings accounts are available.</p>
+{% endif %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}

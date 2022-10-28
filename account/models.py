@@ -5,7 +5,12 @@ from django.utils import timezone
 # Create your models here.
 
 class AccountRecord(models.Model):
+    account_type_options = (
+        ('savings', 'SAVINGS'),
+        ('current', 'CURRENT')
+    )
     name = models.CharField(max_length=100)
+    account_type = models.CharField(max_length=7, choices=account_type_options, default='current')
 
     def __str__(self) -> str:
         return self.name
@@ -15,7 +20,8 @@ class TransactionRecord(models.Model):
     transition_record_options = (
         ('deposit', 'DEPOSIT'),
         ('withdrawal', 'WITHDRAWAL'),
-        ('transfer', 'TRANSFER')
+        ('transfer', 'TRANSFER'),
+        ('interest', 'INTEREST')
     )
 
     transaction_type = models.CharField(max_length=10, choices=transition_record_options)

@@ -1,3 +1,4 @@
+from re import A
 from django.shortcuts import render
 from django.views import generic
 from django.contrib import messages
@@ -79,3 +80,17 @@ def transfer(request):
 
     return HttpResponseRedirect(reverse('transfer'))
     
+
+def monthly_interest(request):
+    savings_account_records = AccountRecord.objects.filter(account_type='savings')
+    saving_accounts = [accounts[account.id] for account in savings_account_records]
+
+    if request.method == 'GET':
+        return render(request, 'account/monthly_interest.html', {'saving_accounts': saving_accounts})
+    
+    elif request.method == 'POST':
+        interest_rate = float(request.POST['interest'])
+        account_id = request.POST['account_id']
+        accounts[account_id].apply_monthly_interest(monthly_percentage=interest_rate)
+        return render(request, 'account/monthly_interest.html', {'saving_accounts': saving_accounts})
+

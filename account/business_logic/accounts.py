@@ -5,23 +5,24 @@ class Account:
     def __init__(self, account_id):
         self.account_id = account_id
         self._balance = None
-        self._account_record = AccountRecord.objects.get(pk=self.account_id)
+        self.account_record = AccountRecord.objects.get(pk=self.account_id)
+        self.account_type = self.account_record.account_type
 
 
-    def calcuate_initial_balance(self):
+    def calculate_initial_balance(self):
         money_in = sum([
             transaction.amount 
             for 
             transaction 
             in 
-            self._account_record.money_in_transactions.all()
+            self.account_record.money_in_transactions.all()
         ])
         money_out = sum([
             transaction.amount 
             for 
             transaction 
             in 
-            self._account_record.money_out_transactions.all()
+            self.account_record.money_out_transactions.all()
         ])
 
         return money_in - money_out
@@ -30,14 +31,14 @@ class Account:
     @property
     def balance(self):
         if self._balance is None:
-            self._balance = self.calcuate_initial_balance()
+            self._balance = self.calculate_initial_balance()
         return self._balance
 
 
     @balance.setter
     def balance(self, new_balance):
         new_audit_record = AuditRecord(
-            account_record = self._account_record,
+            account_record = self.account_record,
             old_balance = self.balance,
             new_balance = new_balance
         )
@@ -49,7 +50,7 @@ class Account:
         self.balance += amount
         new_transaction_record = TransactionRecord(
             transaction_type = 'deposit',
-            target = self._account_record,
+            target = self.account_record,
             amount = amount
         )
         new_transaction_record.save()
@@ -59,7 +60,7 @@ class Account:
         self.balance -= amount
         new_transaction_record = TransactionRecord(
             transaction_type = 'withdraw',
-            source = self._account_record,
+            source = self.account_record,
             amount = amount
         )
         new_transaction_record.save()
@@ -71,8 +72,23 @@ class Account:
         new_transaction_record = TransactionRecord(
             transaction_type = 'transfer',
             source = AccountRecord.objects.get(pk=source_account_id),
-            target = self._account_record,
+            target = self.account_record,
             amount = amount
+        )
+        new_transaction_record.save()
+
+
+class SavingsAccount(Account):
+    account_type = 'savings'        
+
+    def apply_monthly_interest(self, monthly_percentage=0.5):
+        interest_amount = round(self.balance * monthly_percentage / 100)
+        self.balance += interest_amount
+
+        new_transaction_record = TransactionRecord(
+            transaction_type = 'interest',
+            target = self.account_record,
+            amount = interest_amount
         )
         new_transaction_record.save()
 
@@ -82,11 +98,19 @@ class Accounts:
         self._accounts = {}
         pass
 
+    def account_factory(self, account_id):
+        if AccountRecord.objects.get(pk=account_id).account_type == 'current':
+            return Account(account_id)
+        else:
+            return SavingsAccount(account_id)
+
+
     def __getitem__(self, account_id):
         if account_id in self._accounts.keys():
             return self._accounts[account_id]
         else:
-            self._accounts[account_id] = Account(account_id)
-            return self._accounts[account_id]
+            self._accounts[account_id] = self.account_factory(account_id)
+                
+        return self._accounts[account_id]
 
 accounts = Accounts()
