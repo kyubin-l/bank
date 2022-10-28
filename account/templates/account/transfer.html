@@ -1,0 +1,33 @@
+<h1> Transfer </h1>
+
+<form action= "{% url 'transfer' %}" method="post">
+    {% csrf_token %}
+
+    <label> Choose account to transfer from </label><br>
+    <select name="source_account_id">
+        <option selected="selected"> --please choose an account --</option>
+        {% for account in all_accounts %}
+            <option value= {{ account.id }}> {{ account.name }} </option>
+        {% endfor %}
+    </select><br><br>
+
+    <label> Choose account to transfer to </label><br>
+    <select name="target_account_id">
+        <option selected="selected"> --please choose an account --</option>
+        {% for account in all_accounts %}
+            <option value= {{ account.id }}> {{ account.name }} </option>
+        {% endfor %}
+    </select><br><br>
+
+    <label> Enter amount </label><br>
+    <input type="number" name="amount"><br><br>
+    <input type="submit">
+</form>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
