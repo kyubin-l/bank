@@ -18,11 +18,24 @@ class Transaction_Record(models.Model):
         ('withdrawal', 'WITHDRAWAL'),
         ('transfer', 'TRANSFER')
     )
+
     transaction_type = models.CharField(max_length=10, choices=transition_record_options)
-    source = models.IntegerField(null=True, blank=True)
-    target = models.IntegerField(null=True, blank=True)
+    source = models.ForeignKey(
+        Account_Record,
+        on_delete=models.PROTECT, 
+        related_name='money_out_transactions', 
+        null=True, 
+        blank=True
+    )
+    target = models.ForeignKey(
+        Account_Record, 
+        on_delete=models.PROTECT, 
+        related_name='money_in_transactions', 
+        null=True, 
+        blank=True
+    )
     amount = models.IntegerField('amount', default=0)
     created = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f'{self.transaction_type}'
+        return f'{self.transaction_type}, {self.source}, {self.target}, {self.amount}'

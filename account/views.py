@@ -31,9 +31,9 @@ def withdraw(request):
         accounts[account_id].withdraw(amount)
 
         messages.success(request, f'You succesfully withdrew {amount} from account \
-            {Account_Record.objects.get(pk=account_id).name}')
+            {Account_Record.objects.get(pk=account_id)}')
         messages.success(request, f'Account balance for \
-            {Account_Record.objects.get(pk=account_id).name}: {accounts[account_id].balance}')
+            {Account_Record.objects.get(pk=account_id)}: {accounts[account_id].balance}')
 
     return HttpResponseRedirect(reverse('withdraw'))
 
@@ -50,9 +50,9 @@ def deposit(request):
         accounts[account_id].deposit(amount)
 
         messages.success(request, f'You succesfully deposited {amount} to account \
-            {Account_Record.objects.get(pk=account_id).name}')
+            {Account_Record.objects.get(pk=account_id)}')
         messages.success(request, f'Account balance for \
-            {Account_Record.objects.get(pk=account_id).name}: {accounts[account_id].balance}')
+            {Account_Record.objects.get(pk=account_id)}: {accounts[account_id].balance}')
 
     return HttpResponseRedirect(reverse('deposit'))
 
@@ -70,12 +70,12 @@ def transfer(request):
         accounts[target_account_id].transfer_in(amount, source_account_id)
 
         messages.success(request, f'You succesfully transfered {amount} from account \
-            {Account_Record.objects.get(pk=target_account_id).name} \
-            to account {Account_Record.objects.get(pk=source_account_id).name}')
+            {Account_Record.objects.get(pk=source_account_id)} \
+            to account {Account_Record.objects.get(pk=target_account_id)}')
         messages.success(request, f'Account balance for \
-            {Account_Record.objects.get(pk=source_account_id).name}: {accounts[source_account_id].balance}') 
+            {Account_Record.objects.get(pk=source_account_id)}: {accounts[source_account_id].balance}') 
         messages.success(request, f'Account balance for \
-            {Account_Record.objects.get(pk=target_account_id).name}: {accounts[target_account_id].balance}') 
+            {Account_Record.objects.get(pk=target_account_id)}: {accounts[target_account_id].balance}') 
 
     return HttpResponseRedirect(reverse('transfer'))
     
