@@ -27,15 +27,13 @@ def withdraw(request):
     elif request.method == 'POST':
         account_id  = int(request.POST['account_id'])
         amount  = int(request.POST['amount'])
-
         accounts[account_id].withdraw(amount)
 
         messages.success(request, f'You succesfully withdrew {amount} from account \
             {AccountRecord.objects.get(pk=account_id)}')
         messages.success(request, f'Account balance for \
             {AccountRecord.objects.get(pk=account_id)}: {accounts[account_id].balance}')
-
-    return HttpResponseRedirect(reverse('withdraw'))
+        return HttpResponseRedirect(reverse('withdraw'))
 
 
 def deposit(request):
@@ -52,8 +50,7 @@ def deposit(request):
             {accounts[account_id].account_record}')
         messages.success(request, f'Account balance for \
             {accounts[account_id].account_record}: {accounts[account_id].balance}')
-
-    return HttpResponseRedirect(reverse('deposit'))
+        return HttpResponseRedirect(reverse('deposit'))
 
 
 def transfer(request):
@@ -74,9 +71,8 @@ def transfer(request):
             {accounts[source_account_id].account_record}: {accounts[source_account_id].balance}') 
         messages.success(request, f'Account balance for \
             {accounts[target_account_id].account_record}: {accounts[target_account_id].balance}') 
+        return HttpResponseRedirect(reverse('transfer'))
 
-    return HttpResponseRedirect(reverse('transfer'))
-    
 
 def monthly_interest(request):
     savings_account_records = AccountRecord.objects.filter(

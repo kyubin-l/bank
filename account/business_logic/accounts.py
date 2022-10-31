@@ -14,19 +14,12 @@ class Account:
     def calculate_initial_balance(self):
         money_in = sum(
             transaction.amount 
-            for 
-            transaction 
-            in 
-            self.account_record.money_in_transactions.all()
+            for transaction in self.account_record.money_in_transactions.all()
         )
         money_out = sum(
             transaction.amount 
-            for 
-            transaction 
-            in 
-            self.account_record.money_out_transactions.all()
+            for transaction in self.account_record.money_out_transactions.all()
         )
-
         return money_in - money_out
 
     
@@ -75,7 +68,7 @@ class Account:
     
     def process_transaction(self, transaction_type: str, source=None, target=None, amount=0):
         '''
-        source and target take the Account class.
+        source and target take the 'Account' class.
         '''
         new_transaction_record = TransactionRecord(
             transaction_type=transaction_type,
@@ -131,13 +124,11 @@ class Accounts:
     def __getitem__(self, account_id: int):
         assert type(account_id) == int
 
-        if account_id in self._accounts.keys():
-            return self._accounts[account_id]
-        else:
+        if account_id not in self._accounts:
             self._accounts[account_id] = self.account_factory(account_id)
-                
         return self._accounts[account_id]
-
+            
+                
     # Doesn't work quite yet because an instance of Account is only created once it is first called. 
     # @property
     # def savings_accounts(self) -> list:
