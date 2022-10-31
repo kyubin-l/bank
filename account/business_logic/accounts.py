@@ -44,7 +44,7 @@ class Account:
     def deposit(self, amount):
         self.process_transaction(
             transaction_type='deposit',
-            target=self.self,
+            target=self,
             amount=amount
         )
 
