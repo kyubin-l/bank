@@ -7,10 +7,11 @@ from django.utils import timezone
 class AccountRecord(models.Model):
     account_type_options = (
         ('savings', 'SAVINGS'),
-        ('current', 'CURRENT')
+        ('current', 'CURRENT'),
+        ('super_saving','SUPER_SAVING')
     )
     name = models.CharField(max_length=100)
-    account_type = models.CharField(max_length=7, choices=account_type_options, default='current')
+    account_type = models.CharField(max_length=15, choices=account_type_options, default='current')
 
     def __str__(self) -> str:
         return self.name
@@ -54,7 +55,6 @@ class AuditRecord(models.Model):
     old_balance = models.IntegerField(default=0)
     new_balance = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
-
 
     def __str__(self) -> str:
         return f'{self.account_record}, {self.old_balance}, {self.new_balance}'

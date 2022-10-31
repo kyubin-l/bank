@@ -2,13 +2,12 @@ from re import A
 from django.shortcuts import render
 from django.views import generic
 from django.contrib import messages
-
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
+
+
 from .business_logic.accounts import accounts
-from django.core.cache import cache
-
-
 from .models import AccountRecord, TransactionRecord
 # Create your views here.
 
@@ -26,7 +25,7 @@ def withdraw(request):
         return render(request, 'account/withdraw.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
-        account_id  = request.POST['account_id']
+        account_id  = int(request.POST['account_id'])
         amount  = int(request.POST['amount'])
 
         accounts[account_id].withdraw(amount)
@@ -45,7 +44,7 @@ def deposit(request):
         return render(request, 'account/deposit.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
-        account_id  = request.POST['account_id']
+        account_id  = int(request.POST['account_id'])
         amount  = int(request.POST['amount'])
 
         accounts[account_id].deposit(amount)
@@ -64,8 +63,8 @@ def transfer(request):
         return render(request, 'account/transfer.html', {'all_accounts': all_accounts})
 
     elif request.method == 'POST':
-        source_account_id  = request.POST['source_account_id']
-        target_account_id = request.POST['target_account_id']
+        source_account_id  = int(request.POST['source_account_id'])
+        target_account_id = int(request.POST['target_account_id'])
         amount  = int(request.POST['amount'])
 
         accounts[target_account_id].transfer_in(amount, source_account_id)
@@ -82,8 +81,11 @@ def transfer(request):
     
 
 def monthly_interest(request):
-    savings_account_records = AccountRecord.objects.filter(account_type='savings')
+    savings_account_records = AccountRecord.objects.filter(Q(account_type='savings') | Q(account_type='super_saving'))
     savings_accounts = [accounts[account.id] for account in savings_account_records]
+    # savings_accounts = accounts.savings_accounts
+    if request.method == 'GET':
+        return render(request, 'account/monthly_interest.html', {'savings_accounts': savings_accounts})
 
     if request.method == 'POST':
         for account in savings_accounts:
@@ -93,5 +95,4 @@ def monthly_interest(request):
         messages.success(request, f'Interest rate applied!')
         return HttpResponseRedirect(reverse('monthly_interest'))
 
-    return render(request, 'account/monthly_interest.html', {'savings_accounts': savings_accounts})
         
