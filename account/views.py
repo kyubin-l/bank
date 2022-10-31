@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .business_logic.accounts import accounts
-
+from django.core.cache import cache
 
 
 from .models import AccountRecord, TransactionRecord
@@ -83,14 +83,15 @@ def transfer(request):
 
 def monthly_interest(request):
     savings_account_records = AccountRecord.objects.filter(account_type='savings')
-    saving_accounts = [accounts[account.id] for account in savings_account_records]
+    savings_accounts = [accounts[account.id] for account in savings_account_records]
 
-    if request.method == 'GET':
-        return render(request, 'account/monthly_interest.html', {'saving_accounts': saving_accounts})
-    
-    elif request.method == 'POST':
-        interest_rate = float(request.POST['interest'])
-        account_id = request.POST['account_id']
-        accounts[account_id].apply_monthly_interest(monthly_percentage=interest_rate)
-        return render(request, 'account/monthly_interest.html', {'saving_accounts': saving_accounts})
+    if request.method == 'POST':
+        for account in savings_accounts:
+            interest_rate = float(request.POST[f'interest_{account.account_id}'])
+            accounts[account.account_id].apply_monthly_interest(monthly_percentage=interest_rate)
 
+        messages.success(request, f'Interest rate applied!')
+        return HttpResponseRedirect(reverse('monthly_interest'))
+
+    return render(request, 'account/monthly_interest.html', {'savings_accounts': savings_accounts})
+        
