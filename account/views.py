@@ -46,13 +46,12 @@ def deposit(request):
     elif request.method == 'POST':
         account_id  = int(request.POST['account_id'])
         amount  = int(request.POST['amount'])
-
         accounts[account_id].deposit(amount)
 
         messages.success(request, f'You succesfully deposited {amount} to account \
-            {AccountRecord.objects.get(pk=account_id)}')
+            {accounts[account_id].account_record}')
         messages.success(request, f'Account balance for \
-            {AccountRecord.objects.get(pk=account_id)}: {accounts[account_id].balance}')
+            {accounts[account_id].account_record}: {accounts[account_id].balance}')
 
     return HttpResponseRedirect(reverse('deposit'))
 
@@ -66,33 +65,32 @@ def transfer(request):
         source_account_id  = int(request.POST['source_account_id'])
         target_account_id = int(request.POST['target_account_id'])
         amount  = int(request.POST['amount'])
-
         accounts[target_account_id].transfer_in(amount, source_account_id)
 
         messages.success(request, f'You succesfully transfered {amount} from account \
-            {AccountRecord.objects.get(pk=source_account_id)} \
-            to account {AccountRecord.objects.get(pk=target_account_id)}')
+            {accounts[source_account_id].account_record} \
+            to account {accounts[target_account_id].account_record}')
         messages.success(request, f'Account balance for \
-            {AccountRecord.objects.get(pk=source_account_id)}: {accounts[source_account_id].balance}') 
+            {accounts[source_account_id].account_record}: {accounts[source_account_id].balance}') 
         messages.success(request, f'Account balance for \
-            {AccountRecord.objects.get(pk=target_account_id)}: {accounts[target_account_id].balance}') 
+            {accounts[target_account_id].account_record}: {accounts[target_account_id].balance}') 
 
     return HttpResponseRedirect(reverse('transfer'))
     
 
 def monthly_interest(request):
-    savings_account_records = AccountRecord.objects.filter(Q(account_type='savings') | Q(account_type='super_saving'))
+    savings_account_records = AccountRecord.objects.filter(
+        Q(account_type='savings') | 
+        Q(account_type='super_saving')
+        )
     savings_accounts = [accounts[account.id] for account in savings_account_records]
-    # savings_accounts = accounts.savings_accounts
     if request.method == 'GET':
         return render(request, 'account/monthly_interest.html', {'savings_accounts': savings_accounts})
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         for account in savings_accounts:
             interest_rate = float(request.POST[f'interest_{account.account_id}'])
             accounts[account.account_id].apply_monthly_interest(monthly_percentage=interest_rate)
 
         messages.success(request, f'Interest rate applied!')
         return HttpResponseRedirect(reverse('monthly_interest'))
-
-        
